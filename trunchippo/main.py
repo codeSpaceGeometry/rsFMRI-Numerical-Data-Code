@@ -8,40 +8,40 @@ from sklearn.cluster import KMeans
 import glob
 import os
 
-path = r'C:/fMRI/trunchippo/data'
+#Building a path variable to the data in my personal C: drive.
+#To play with the Harvard Dataverse numerical data yourself, you'll have to cater the path
+#variable to wherever you place this folder in your computer.
+path = r'C:/fMRI/trunchippoL/data'
 
-os.listdir(path)
-
+#Building a dataframe based on a pandas.read_csv method.
+#Takes files ending in csv from your specified path, so be sure to have nothing but the data you want to look at.
 dfs = [pd.read_csv(filename, index_col=None, header=0) for filename in os.listdir(path)]
 
-
+#Concatenates or fuses the two data tables into a single dataframe.
 df = pd.concat(dfs, axis=0, ignore_index=True)
 
-df.head(22)
+#Allows you to view rows of your dataframe beyond the default of 5.
+df.head()
 
+#Useful print function for displaying dataframe
 print(df.describe)
 
+#Useful print function for displaying column names
 print(df.columns)
 
-sns.pairplot(data=df, vars=['Degree', 'GlobalEfficiency'], hue="Degree")
-
-plt.show()
-
+#Here, we import sk.learn cluster to build our k-means clusters.
 import sklearn.cluster as cluster
 
+#Fit the axes to a cluster of value n.
 kmeans = cluster.KMeans(n_clusters=3, init="k-means++")
 kmeans = kmeans.fit(df[['Degree', 'GlobalEfficiency']])
 
-print(kmeans.cluster_centers_)
-
+#Adds a Clusters column to the dataframe.
 df['Clusters'] = kmeans.labels_
 
-print(df.head(22))
-
-print(df['Clusters'].value_counts())
-
+#Assigns the cluster-clad dataframe its own csv file.
 df.to_csv('DegreeEfficiencyClusters.csv', index=False)
 
+#Plot
 sns.scatterplot(x="Degree", y="GlobalEfficiency", hue='Clusters', data=df)
-#plt.show()
-
+plt.show()
